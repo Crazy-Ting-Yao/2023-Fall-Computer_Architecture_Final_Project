@@ -5,6 +5,7 @@
 #include <map>
 #include <algorithm>
 #include <vector>
+#include <set>
 using namespace std;
 
 class Block{
@@ -78,7 +79,6 @@ class Simulate{
         void set_cache_sets(int cache_sets) {
             this->cache_sets = cache_sets;
             index_bits_num = log2(cache_sets);
-            index_bits.reserve(index_bits_num);
         }
         void set_associativity(int associativity) { this->associativity = associativity;}
         int get_address_bits() { return address_bits;}
@@ -97,7 +97,7 @@ class Simulate{
         int cache_bits;
         vector<string> ref;
         vector<string> tags;
-        vector<int> index_bits;
+        set<int> index_bits;
         string benchmark;
         map<string,Cache> simulate_cache; 
 };
@@ -163,7 +163,7 @@ void Simulate::initialize(ifstream& infile, ofstream& outfile, int LSB_en) {
     }
     if(LSB_en){
         for(int i = 0; i < index_bits_num; i++) {
-            index_bits.push_back(i);
+            index_bits.insert(i);
         }
     }
     else{
@@ -203,28 +203,19 @@ void Simulate::initialize(ifstream& infile, ofstream& outfile, int LSB_en) {
             for(int j = 0; j < cache_bits; j++) {
                 if(quality[j] > quality[max_index]) max_index = j;
             }
-            index_bits.push_back(max_index);
+            index_bits.insert(max_index);
             for(int j = 0; j < cache_bits; j++) {
                 quality[j] *= correlation_matrix[max_index][j];
             }
         }
-        sort(index_bits.begin(), index_bits.end());
-        index_bits.erase(unique(index_bits.begin(), index_bits.end()), index_bits.end());
-        while(index_bits.size() < index_bits_num) {
-            int flag = 0;
-            for(int i = 0; i < index_bits.size();i++){
-                if(index_bits[i] != i) {
-                    index_bits.insert(index_bits.begin() + i, i);
-                    flag = 1;
-                    break;
-                }
-            }
-            if(flag == 0) index_bits.push_back(index_bits.size());
+        int i = 0;
+        while (index_bits.size() < index_bits_num) {
+            index_bits.insert(i++);
         }
     }
     outfile << "Indexing bits:";
-    for(int i = index_bits_num-1; i >= 0; i--) {
-        outfile << " " << offset_bits + index_bits[i];
+    for(set<int>::iterator i = index_bits.begin(); i != index_bits.end(); ++i) {
+        outfile << " " << *i + offset_bits;
     }
     outfile << endl << endl;
 }
