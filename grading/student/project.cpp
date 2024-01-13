@@ -214,7 +214,7 @@ void Simulate::initialize(ifstream& infile, ofstream& outfile, int LSB_en) {
         }
     }
     outfile << "Indexing bits:";
-    for(set<int>::iterator i = index_bits.begin(); i != index_bits.end(); ++i) {
+    for(set<int>::reverse_iterator i = index_bits.rbegin(); i != index_bits.rend(); ++i) {
         outfile << " " << *i + offset_bits;
     }
     outfile << endl << endl;
