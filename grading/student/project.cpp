@@ -86,7 +86,7 @@ class Simulate{
         int get_cache_sets() { return cache_sets;}
         int get_associativity() { return associativity;}
         void simulation(ofstream& outfile);
-        void initialize(ifstream& infile, ofstream& outfile, int LSB_en = 0);
+        void initialize(ifstream& infile, ofstream& outfile, bool LSB_en = false);
     private:
         int address_bits;
         int block_size;
@@ -145,13 +145,13 @@ int main(int argc, char *argv[]) {
     outfile << endl;
     infile.close();
     infile.open(argv[2]);
-    simulate.initialize(infile, outfile, 0);
+    simulate.initialize(infile, outfile);
     simulate.simulation(outfile);
     infile.close();
     return 0;
 }
 
-void Simulate::initialize(ifstream& infile, ofstream& outfile, int LSB_en) {
+void Simulate::initialize(ifstream& infile, ofstream& outfile, bool LSB_en) {
     outfile << "Offset bit count: " << offset_bits << endl;
     outfile << "Indexing bit count: " << index_bits_num << endl;
     getline(infile, benchmark);
